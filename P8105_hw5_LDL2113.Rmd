@@ -132,20 +132,20 @@ sim_regression = function(n = 30, beta0 = 2, beta1){
 ```
 
 Set β1=0. Generate 10000 datasets from the model
-```{r, eval=FALSE}
+```{r}
 sim_results_0 = 
-  rerun(10000, sim_regression(30, 2, 0)) %>% 
+  rerun(100, sim_regression(30, 2, 0)) %>% 
   bind_rows() 
 
 head(sim_results_0)
 ```
 
 Repeat the above for β1={1,2,3,4,5,6}
-```{r, eval=FALSE}
+```{r}
 sim_results_1to6 = 
   tibble(beta1s = c(1,2,3,4,5,6)) %>% 
   mutate(
-    output_list = map(.x = beta1s, ~rerun(10000, sim_regression(beta1 = .x))),
+    output_list = map(.x = beta1s, ~rerun(100, sim_regression(beta1 = .x))),
     estimate_dfs = map(output_list, bind_rows)
   ) %>% 
   select(-output_list) %>% 
@@ -158,7 +158,7 @@ head(sim_results_1to6)
 ```
 
 Make a plot showing the proportion of times the null was rejected (the power of the test) on the y axis and the true value of β1 on the x axis. Describe the association between effect size and power.
-```{r, eval=FALSE}
+```{r}
 results_reject = sim_results_1to6 %>%
   select(beta1s, reject_null) %>%
   count(beta1s, reject_null) %>% 

@@ -166,8 +166,7 @@ results_reject = sim_results_1to6 %>%
   transmute(reject_null, percentage_reject = n/sum(n)*100) %>%
   filter(reject_null == 1)
 
-figure_results_reject = results_reject %>%
-  ggplot(aes(x = beta1s, y = percentage_reject)) + 
+ggplot(results_reject, aes(x = beta1s, y = percentage_reject)) + 
   geom_point() +
     labs(
       title = "Rate of Rejecting H0 by Magnitude of Beta1",
@@ -177,4 +176,43 @@ figure_results_reject = results_reject %>%
     )
 ```
 
-As the magnitude of Beta1 increases (effect size), the power of the study (likelihood of rejecting null hypothesis) increases.
+*As the magnitude of Beta1 increases (effect size), the power of the study (likelihood of rejecting null hypothesis) increases.*
+
+Make a plot showing the average estimate of β^1 on the y axis and the true value of β1 on the x axis. Make a second plot (or overlay on the first) the average estimate of β^1 only in samples for which the null was rejected on the y axis and the true value of β1 on the x axis. Is the sample average of β^1 across tests for which the null is rejected approximately equal to the true value of β1? Why or why not?
+
+```{r}
+results_average = sim_results_1to6 %>%
+  group_by(beta1s) %>%
+  mutate(
+    mean_predicted = mean(beta1_hat)
+  )
+
+ggplot(results_average, aes(x = beta1s, y = mean_predicted)) + 
+  geom_point() +
+  geom_line() +
+    labs(
+      title = "Beta1 values vs. average predicted values",
+      x = "True value of beta1",
+      y = "Mean predicted value of beta1",
+      caption = "Simulation Data"
+    )
+```
+
+```{r}
+results_average_reject = sim_results_1to6 %>% 
+  group_by(beta1s) %>% 
+  filter(reject_null == 1) %>% 
+  mutate(mean_predicted_reject = mean(beta1_hat))
+
+ggplot(results_average_reject, aes(x = beta1s, y = mean_predicted_reject)) +
+  geom_point() +
+  geom_line() +
+  labs(
+    title = "Beta1 values vs. average predicted values when H0 rejected",
+      x = "True value of beta1",
+      y = "Mean predicted value of beta1",
+      caption = "Simulation Data"
+    )
+```
+
+*When the null is rejected, we by definition are dealing with a predicted beta that differs substantially from the true beta. It is for this reason that we observe that the mean of the predicted betas is not approximately the same as the true value of the betas when looking at the plot when H0 is rejected.*
